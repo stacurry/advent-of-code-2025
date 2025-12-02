@@ -2,12 +2,20 @@
 
 const fs = require("fs");
 
+let password = 0;
+
 const parseRotation = function (rotation) {
   const letter = rotation[0];
   const number = parseInt(rotation.slice(1));
 
+  const fullRotations = Math.floor(number / 100);
+
+  if (fullRotations) {
+    password += fullRotations;
+  }
+
   if (letter === "L") {
-    return (-1 * number) % 100;
+    return -1 * (number % 100);
   }
   return number % 100;
 };
@@ -15,11 +23,19 @@ const parseRotation = function (rotation) {
 const determineNewValue = function (startValue, incrementValue) {
   const naiveValue = startValue + incrementValue;
   if (naiveValue < 0) {
-    return 100 + naiveValue;
+    const finalValue = 100 + naiveValue;
+    if (startValue !== 0 && finalValue !== 0) {
+      password++;
+    }
+    return finalValue;
   }
 
   if (naiveValue > 99) {
-    return naiveValue - 100;
+    const finalValue = naiveValue - 100;
+    if (startValue !== 0 && finalValue !== 0) {
+      password++;
+    }
+    return finalValue;
   }
   return naiveValue;
 };
@@ -30,7 +46,6 @@ const processInput = function () {
   const input = fileContent.split(/\r?\n/);
 
   let startValue = 50;
-  let password = 0;
 
   input.forEach((rotation) => {
     const incrementValue = parseRotation(rotation);
